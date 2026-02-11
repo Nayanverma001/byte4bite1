@@ -1,0 +1,272 @@
+<!--
+  FoodCycle — Open index.html in your browser.
+  Keep style.css, app.js, router.js in the same folder as this file.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FoodCycle — Good food should never become waste</title>
+  <meta name="description" content="FoodCycle connects surplus food with people who need it.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header" id="siteHeader">
+    <div class="header-inner">
+      <a href="#" class="logo" id="logoLink">FoodCycle</a>
+      <div class="header-actions" id="headerActions">
+        <a href="#" class="btn-back" id="headerBack" aria-label="Back" style="display: none;">← Back</a>
+        <a href="#" class="btn btn-secondary btn-sm" id="headerChats" style="display: none;">💬 Chats</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- VIEW: Landing (display:block so something shows before JS loads) -->
+    <div id="view-landing" class="view landing-view" style="display: block;">
+      <div class="landing-main">
+        <h1 class="landing-headline">
+          Good food should never become <span class="accent">waste</span>.<br>
+          Someone is waiting tonight.
+        </h1>
+        <p class="landing-sub">Choose how you want to help</p>
+        <div class="role-cards">
+          <a href="#" class="role-card" data-role="donor" data-goto="login">
+            <div class="role-icon">🍽️</div>
+            <h2>I am a Donor / Seller</h2>
+            <p>I have surplus food to give. I want to list it so it reaches someone who needs it.</p>
+          </a>
+          <a href="#" class="role-card" data-role="buyer" data-goto="login">
+            <div class="role-icon">❤️</div>
+            <h2>I am a Buyer / NGO</h2>
+            <p>I need food for my community or organization. I want to find surplus food nearby.</p>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: Login -->
+    <div id="view-login" class="view page-view" style="display: none;">
+      <div class="page-container">
+        <h1 class="page-title" id="loginTitle">Sign in</h1>
+        <p class="page-sub" id="loginSub">Enter your details to continue</p>
+        <div id="loginAlert" class="alert alert-error hidden"></div>
+        <div class="form-card">
+          <form id="loginForm">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" placeholder="Your name" required>
+            </div>
+            <div class="form-group">
+              <label for="contact">Phone or Email</label>
+              <input type="text" id="contact" name="contact" placeholder="Phone number or email" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Continue</button>
+          </form>
+        </div>
+        <p class="text-muted" style="margin-top: 1.5rem; text-align: center;">
+          <a href="#" class="link" data-goto="landing">← Back to home</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- VIEW: Donor -->
+    <div id="view-donor" class="view" style="display: none;">
+      <div class="donor-layout">
+        <div class="donor-header">
+          <h1>Hello, <span id="donorName">Donor</span></h1>
+          <div class="donor-actions">
+            <a href="#" class="btn btn-secondary btn-sm" data-goto="chats">💬 Chats</a>
+            <div class="notification-bell-wrap" id="notificationArea"></div>
+          </div>
+        </div>
+        <div class="panel" id="myListingsPanel" style="display: none;">
+          <h2>Your listings</h2>
+          <p class="text-muted" style="margin-bottom: 1rem;">Food you've listed. Data is saved in your browser.</p>
+          <div class="my-listings-grid" id="myListingsGrid"></div>
+        </div>
+        <div class="panel" id="outOfStockPanel" style="display: none;">
+          <h2>Out of stock / expired</h2>
+          <p class="text-muted" style="margin-bottom: 1rem;">Items that have passed their expiry time.</p>
+          <div class="my-listings-grid" id="outOfStockGrid"></div>
+        </div>
+        <div class="panel" id="chatsPanel" style="display: none;">
+          <h2>Recent chats</h2>
+          <div id="chatsPreviewList"></div>
+          <p class="text-muted" style="margin-top: 0.5rem;"><a href="#" class="link" data-goto="chats">View all chats →</a></p>
+        </div>
+        <div class="panel" id="notificationsPanel" style="display: none;">
+          <h2>Notifications</h2>
+          <div id="notificationsList"></div>
+        </div>
+        <div class="panel" id="formPanel">
+          <h2>List Surplus Food</h2>
+          <p class="text-muted panel-hint">Your draft is saved automatically. Choose an image and fill details below.</p>
+          <div id="formError" class="alert alert-error hidden"></div>
+          <form id="donorForm">
+            <div class="form-group">
+              <label>Choose food image</label>
+              <div class="preset-images" id="presetImages"></div>
+              <input type="hidden" id="selectedImageUrl" name="imageUrl" value="">
+            </div>
+            <div class="form-group">
+              <label>Quick add (tap to fill)</label>
+              <div class="quick-fill" id="quickFill"></div>
+            </div>
+            <div class="form-group">
+              <label for="foodName">Food name</label>
+              <input type="text" id="foodName" name="foodName" placeholder="e.g. Rice, Dal, Bread" required>
+            </div>
+            <div class="form-group">
+              <label>Food type</label>
+              <div class="food-type-options">
+                <label class="food-type-option">
+                  <input type="radio" name="foodType" value="vegetarian" required checked>
+                  <span class="food-type-label veg">Vegetarian</span>
+                </label>
+                <label class="food-type-option">
+                  <input type="radio" name="foodType" value="non-vegetarian">
+                  <span class="food-type-label non-veg">Non-vegetarian</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="quantity">Quantity</label>
+              <input type="text" id="quantity" name="quantity" placeholder="e.g. 5 kg, 20 packets" required>
+            </div>
+            <div class="form-group">
+              <label for="location">Location</label>
+              <input type="text" id="location" name="location" placeholder="Area, city or full address" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="expiryDate">Expiry date <span class="text-muted">(required)</span></label>
+                <input type="date" id="expiryDate" name="expiryDate" required min="">
+              </div>
+              <div class="form-group">
+                <label for="expiryTime">Expiry time <span class="text-muted">(required)</span></label>
+                <input type="time" id="expiryTime" name="expiryTime" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="description">Description (optional)</label>
+              <input type="text" id="description" name="description" placeholder="Any extra details">
+            </div>
+            <button type="submit" class="btn btn-primary">List this food</button>
+          </form>
+        </div>
+        <div class="panel thank-you-section hidden" id="thankYouSection">
+          <h3>Thank you for saving food ❤️</h3>
+          <p>Someone out there may sleep hungry tonight — but not today.</p>
+          <p class="status-badge">Waiting for interested buyers…</p>
+          <p style="margin-top: 1rem;">
+            <button type="button" class="btn btn-secondary" id="listAnotherBtn">List another item</button>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: Buyer -->
+    <div id="view-buyer" class="view" style="display: none;">
+      <div class="buyer-layout">
+        <div class="buyer-header">
+          <h1>Find surplus food near you</h1>
+          <div class="buyer-toolbar">
+            <input type="text" class="search-bar" id="searchBar" placeholder="Search by food name, location...">
+            <div class="filter-row">
+              <div class="filter-tabs" id="filterTabs">
+                <button type="button" class="filter-tab active" data-filter="all">All</button>
+                <button type="button" class="filter-tab" data-filter="vegetarian">Veg</button>
+                <button type="button" class="filter-tab" data-filter="non-vegetarian">Non-veg</button>
+                <button type="button" class="filter-tab" data-filter="saved">Saved</button>
+              </div>
+              <div class="sort-wrap">
+                <label for="sortSelect" class="sort-label">Sort:</label>
+                <select id="sortSelect" class="sort-select">
+                  <option value="expiry">Soonest to expire</option>
+                  <option value="newest">Newest first</option>
+                  <option value="location">Location A–Z</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="toast" class="toast hidden" role="status"></div>
+        <div class="food-grid" id="foodGrid"></div>
+        <div class="empty-state hidden" id="emptyState">
+          <p>No surplus food listed right now.</p>
+          <p class="text-muted">Check back later — donors are adding food every day.</p>
+        </div>
+      </div>
+      <!-- Review modal -->
+      <div class="modal-overlay hidden" id="reviewModal">
+        <div class="modal">
+          <div class="modal-header">
+            <h2 id="reviewModalTitle">Reviews</h2>
+            <button type="button" class="modal-close" id="reviewModalClose" aria-label="Close">×</button>
+          </div>
+          <div class="modal-body">
+            <div class="reviews-summary" id="reviewsSummary"></div>
+            <div class="reviews-list" id="reviewsList"></div>
+            <div class="review-form-wrap">
+              <h3>Write a review</h3>
+              <form id="reviewForm">
+                <input type="hidden" id="reviewFoodId" name="foodId">
+                <div class="form-group">
+                  <label>Rating</label>
+                  <div class="star-rating" id="starRating">
+                    <button type="button" class="star" data-rating="1" aria-label="1 star">★</button>
+                    <button type="button" class="star" data-rating="2" aria-label="2 stars">★</button>
+                    <button type="button" class="star" data-rating="3" aria-label="3 stars">★</button>
+                    <button type="button" class="star" data-rating="4" aria-label="4 stars">★</button>
+                    <button type="button" class="star" data-rating="5" aria-label="5 stars">★</button>
+                  </div>
+                  <input type="hidden" id="reviewRating" name="rating" value="0">
+                </div>
+                <div class="form-group">
+                  <label for="reviewComment">Comment (optional)</label>
+                  <textarea id="reviewComment" name="comment" rows="3" placeholder="Share your experience..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit review</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: Chats list -->
+    <div id="view-chats" class="view" style="display: none;">
+      <div class="chats-layout">
+        <h1 class="page-title">Messages</h1>
+        <p class="page-sub" id="chatsSub">Your conversations with donors and buyers.</p>
+        <div class="chats-list" id="chatsList"></div>
+        <div class="empty-state" id="chatsEmpty" style="display: none;">
+          <p>No conversations yet.</p>
+          <p class="text-muted">When someone shows interest or you message a donor, your chats will appear here.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: Chat thread -->
+    <div id="view-chat" class="view chat-view" style="display: none;">
+      <div class="chat-layout">
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-wrap">
+          <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." maxlength="500" autocomplete="off">
+          <button type="button" class="btn btn-primary btn-send" id="sendBtn">Send</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>FoodCycle — Reducing waste, feeding hope.</p>
+    <p class="footer-note">Your data is saved in your browser. No server required.</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="router.js"></script>
+</body>
+</html>
